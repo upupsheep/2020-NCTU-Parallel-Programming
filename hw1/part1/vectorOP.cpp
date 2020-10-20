@@ -85,8 +85,13 @@ void clampedExpVector(float *values, int *exponents, float *output, int N) {
         // Execute "if"
         _pp_vset_float(result, 9.999999f, maskThreshold);
 
-        // // Write results back to memory
-        _pp_vstore_float(output + i, result, maskAll);
+        // Write results back to memory
+        if ((i + VECTOR_WIDTH) > N) {
+            __pp_mask maskLast = _pp_init_ones((N) % VECTOR_WIDTH);
+            _pp_vstore_float(output + i, result, maskLast);
+        } else {
+            _pp_vstore_float(output + i, result, maskAll);
+        }
     }
 }
 
