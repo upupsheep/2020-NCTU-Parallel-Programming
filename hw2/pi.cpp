@@ -16,12 +16,14 @@ lli total_in_circle = 0;
 lli* thread_in_circle;
 
 void* MonteCarlo_Pi(void* argument) {
-    srand(time(NULL));
+    unsigned int seed = time(NULL);
     double number_in_circle = 0.0;
-    for (int toss = 0; toss < (number_of_tosses / cpu_cores); toss++) {
+    for (int toss = number_of_tosses / cpu_cores; toss >= 0; toss--) {
         // random x and y
-        double x = (double)rand() / RAND_MAX;
-        double y = (double)rand() / RAND_MAX;
+        // double x = (double)rand() / RAND_MAX;
+        // double y = (double)rand() / RAND_MAX;
+		double x = rand_r(&seed) / ((double)RAND_MAX);
+		double y = rand_r(&seed) / ((double)RAND_MAX);
 
         double distance_squared = x * x + y * y;
         if (distance_squared <= 1)
