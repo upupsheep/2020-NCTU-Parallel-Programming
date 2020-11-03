@@ -3,7 +3,7 @@
 # C_FLAGS=-std=gnu99 -O2
 # SOURCE=pi.c
 
-# LIBS=-pthread
+LIBS=-pthread
 
 # TARGET2=pi_out_single.o
 # CC=gcc
@@ -18,7 +18,7 @@ SOURCE2=pi.cpp
 all: pi.cpp
 	# $(CC) $(SOURCE) -o $(TARGET) $(C_FLAGS) $(LIBS)
 	# $(CC) $(SOURCE2) -o $(TARGET2) $(C_FLAGS) $(LIBS)
-	$(CPP2) $(SOURCE2) -o $(TARGET2) $(CPP_FLAGS2)
+	$(CPP2) $(SOURCE2) -o $(TARGET2) $(CPP_FLAGS2) $(LIBS)
 
 .PHONY: clean
 clean:

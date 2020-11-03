@@ -1,20 +1,21 @@
+#include <pthread.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <pthread.h>
 using namespace std;
 
 typedef long long int lli;
 
 // global variables
 int cpu_cores;
+lli number_of_tosses;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+lli total_in_circle = 0;
+lli* thread_in_circle;
 
-double MonteCarlo_Pi(lli number_of_tosses) {
-    long thread;  // Use long in case of a 64-bit system
-    pthread_t* thread_handles;
-    thread_handles = (pthread_t*)malloc(cpu_cores * sizeof(pthread_t));
-
+void* MonteCarlo_Pi(void* argument) {
     srand(time(NULL));
     double number_in_circle = 0.0;
     for (int toss = 0; toss < (number_of_tosses / cpu_cores); toss++) {
@@ -26,8 +27,12 @@ double MonteCarlo_Pi(lli number_of_tosses) {
         if (distance_squared <= 1)
             number_in_circle++;
     }
-    double pi_estimate = 4.0 * number_in_circle / ((double)number_of_tosses);
-    return pi_estimate;
+    pthread_mutex_lock(&mutex);
+    total_in_circle += number_in_circle;
+    pthread_mutex_unlock(&mutex);
+    pthread_exit(EXIT_SUCCESS);
+    // double pi_estimate = 4.0 * number_in_circle / ((double)number_of_tosses);
+    // return pi_estimate;
 }
 
 int main(int argc, char* argv[]) {
@@ -36,9 +41,27 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     cpu_cores = atoi(argv[1]);
-    lli number_of_tosses = atoll(argv[2]);
+    number_of_tosses = atoll(argv[2]);
 
-    double pi = MonteCarlo_Pi(number_of_tosses);
-    cout << pi << endl;
+    // in_circle count in each thread
+    thread_in_circle = new long long int[cpu_cores];
+    pthread_t thread_id[cpu_cores];
+
+    for (int i = 0; i < cpu_cores; i++) {
+        pthread_create(&thread_id[i], NULL, MonteCarlo_Pi, (void*)i);
+    }
+
+    for (int i = 0; i < cpu_cores; i++) {
+        pthread_join(thread_id[i], NULL);
+    }
+
+    // Calculate pi
+    // lli sum = 0;
+    // for (int i = 0; i < cpu_cores; i++) {
+    //     sum += thread_in_circle[i];
+    // }
+    double pi_estimate = 4.0 * total_in_circle / ((double)number_of_tosses);
+    cout << pi_estimate << endl;
+
     return 0;
 }
