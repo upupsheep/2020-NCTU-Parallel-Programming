@@ -18,12 +18,12 @@ lli* thread_in_circle;
 void* MonteCarlo_Pi(void* argument) {
     unsigned int seed = time(NULL);
     double number_in_circle = 0.0;
-    for (int toss = number_of_tosses / cpu_cores; toss >= 0; toss--) {
+    for (int toss = 0; toss < number_of_tosses / cpu_cores; toss++) {
         // random x and y
         // double x = (double)rand() / RAND_MAX;
         // double y = (double)rand() / RAND_MAX;
-		double x = rand_r(&seed) / ((double)RAND_MAX);
-		double y = rand_r(&seed) / ((double)RAND_MAX);
+        double x = rand_r(&seed) / ((double)RAND_MAX);
+        double y = rand_r(&seed) / ((double)RAND_MAX);
 
         double distance_squared = x * x + y * y;
         if (distance_squared <= 1)
@@ -44,6 +44,7 @@ int main(int argc, char* argv[]) {
     }
     cpu_cores = atoi(argv[1]);
     number_of_tosses = atoll(argv[2]);
+    srand(time(NULL));
 
     // in_circle count in each thread
     thread_in_circle = new long long int[cpu_cores];
