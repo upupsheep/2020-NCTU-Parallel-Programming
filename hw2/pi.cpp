@@ -56,10 +56,6 @@ int main(int argc, char* argv[]) {
     }
 
     // Calculate pi
-    // lli sum = 0;
-    // for (int i = 0; i < cpu_cores; i++) {
-    //     sum += thread_in_circle[i];
-    // }
     double pi_estimate = 4.0 * total_in_circle / ((double)number_of_tosses);
     cout << pi_estimate << endl;
 
