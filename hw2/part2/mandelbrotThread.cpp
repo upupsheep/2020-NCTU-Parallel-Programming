@@ -37,11 +37,15 @@ void workerThreadStart(WorkerArgs *const args) {
     int threadId = args->threadId;
     int numThreads = args->numThreads;
 
-    /*
+	double minTime = 1e30;
+	double startTime = CycleTimer::currentSeconds();
+    
+	/*
     // Split window by height
     int totalRows = args->height / numThreads;
     int startRow = 0 + threadId * totalRows;
-    */
+	*/
+    
     // Run one row a time
     for (int i = threadId; i < args->height; i += numThreads) {
         int startRow = i;
@@ -54,6 +58,10 @@ void workerThreadStart(WorkerArgs *const args) {
             args->maxIterations,
             args->output);
     }
+	
+	double endTime = CycleTimer::currentSeconds();
+	minTime = min(minTime, endTime - startTime);
+	printf("Thread %d: %f\n", threadId, minTime);
 }
 
 //
@@ -100,8 +108,10 @@ void mandelbrotThread(
     for (int i = 1; i < numThreads; i++) {
         workers[i] = std::thread(workerThreadStart, &args[i]);
     }
+	
 
     workerThreadStart(&args[0]);
+
 
     // join worker threads
     for (int i = 1; i < numThreads; i++) {
