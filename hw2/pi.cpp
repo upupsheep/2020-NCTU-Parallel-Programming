@@ -20,7 +20,7 @@ void* MonteCarlo_Pi(void* threadId) {
     long_tid = (long)threadId;
     int tid = (int)long_tid;
 
-    unsigned int seed = time(NULL);
+    unsigned int seed = time(NULL) + 10 * tid;
     double number_in_circle = 0.0;
 
     int toss;
@@ -80,6 +80,7 @@ int main(int argc, char* argv[]) {
     // Calculate pi
     double pi_estimate = 4.0 * total_in_circle / ((double)number_of_tosses);
     cout << pi_estimate << endl;
-
+	
+	//pthread_exit(NULL);
     return 0;
 }
