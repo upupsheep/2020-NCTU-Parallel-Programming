@@ -15,10 +15,16 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 lli total_in_circle = 0;
 lli* thread_in_circle;
 
-void* MonteCarlo_Pi(void* argument) {
+void* MonteCarlo_Pi(void* threadId) {
+    long long_tid;
+    long_tid = (long)threadId;
+    int tid = (int)long_tid;
+
     unsigned int seed = time(NULL);
     double number_in_circle = 0.0;
-    for (int toss = 0; toss < number_of_tosses / cpu_cores; toss++) {
+
+    int toss;
+    for (toss = 0; toss < number_of_tosses / cpu_cores; toss++) {
         // random x and y
         // double x = (double)rand() / RAND_MAX;
         // double y = (double)rand() / RAND_MAX;
@@ -28,6 +34,19 @@ void* MonteCarlo_Pi(void* argument) {
         double distance_squared = x * x + y * y;
         if (distance_squared <= 1)
             number_in_circle++;
+    }
+
+    // Let thread 0 calculate the remaining part
+    if (tid == 0) {
+        int remainder = toss % cpu_cores;
+        for (toss = 0; toss < remainder; toss++) {
+            double x = rand_r(&seed) / ((double)RAND_MAX);
+            double y = rand_r(&seed) / ((double)RAND_MAX);
+
+            double distance_squared = x * x + y * y;
+            if (distance_squared <= 1)
+                number_in_circle++;
+        }
     }
     pthread_mutex_lock(&mutex);
     total_in_circle += number_in_circle;
