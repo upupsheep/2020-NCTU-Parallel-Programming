@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     // Calculate pi
     double pi_estimate = 4.0 * total_in_circle / ((double)number_of_tosses);
     // cout << pi_estimate << endl;
-    printf("%lld\n", pi_estimate);
+    printf("%lf\n", pi_estimate);
 
     //pthread_exit(NULL);
     return 0;
