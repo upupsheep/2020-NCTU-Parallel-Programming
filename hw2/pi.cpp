@@ -65,10 +65,10 @@ int main(int argc, char* argv[]) {
     }
     cpu_cores = atoi(argv[1]);
     number_of_tosses = atoll(argv[2]);
-    srand(time(NULL));
+    // srand(time(NULL));
 
     // in_circle count in each thread
-    thread_in_circle = new long long int[cpu_cores];
+    // thread_in_circle = new long long int[cpu_cores];
     pthread_t thread_id[cpu_cores];
 
     for (int i = 0; i < cpu_cores; i++) {
@@ -81,7 +81,8 @@ int main(int argc, char* argv[]) {
 
     // Calculate pi
     double pi_estimate = 4.0 * total_in_circle / ((double)number_of_tosses);
-    cout << pi_estimate << endl;
+    // cout << pi_estimate << endl;
+    printf("%lld\n", pi_estimate);
 
     //pthread_exit(NULL);
     return 0;
