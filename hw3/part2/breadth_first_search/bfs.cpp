@@ -33,7 +33,7 @@ void top_down_step(
     int *distances) {
     int local_count;
 
-#pragma omp parallel private(local_count) {
+#pragma omp parallel private(local_count)
     local_count = 0;
     int *local_frontier = (int *)malloc(sizeof(int) * (g->num_nodes / 4));
 
@@ -63,10 +63,10 @@ void top_down_step(
     }
 #pragma omp critical
     {
-        memcpy(new_frontier->present + new_frontier->count, local_frontier, local_count * sizeof(int));
+        memcpy(new_frontier->vertices + new_frontier->count, local_frontier, local_count * sizeof(int));
         new_frontier->count += local_count;
     }
-}
+
 }
 
 // Implements top-down BFS.
