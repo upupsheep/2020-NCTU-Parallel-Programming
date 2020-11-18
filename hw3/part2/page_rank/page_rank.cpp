@@ -15,20 +15,17 @@
 // damping:     page-rank algorithm's damping parameter
 // convergence: page-rank algorithm's convergence threshold
 //
-void pageRank(Graph g, double *solution, double damping, double convergence)
-{
+void pageRank(Graph g, double *solution, double damping, double convergence) {
+    // initialize vertex weights to uniform probability. Double
+    // precision scores are used to avoid underflow for large graphs
 
-  // initialize vertex weights to uniform probability. Double
-  // precision scores are used to avoid underflow for large graphs
+    int numNodes = num_nodes(g);
+    double equal_prob = 1.0 / numNodes;
+    for (int i = 0; i < numNodes; ++i) {
+        solution[i] = equal_prob;
+    }
 
-  int numNodes = num_nodes(g);
-  double equal_prob = 1.0 / numNodes;
-  for (int i = 0; i < numNodes; ++i)
-  {
-    solution[i] = equal_prob;
-  }
-
-  /*
+    /*
      For PP students: Implement the page rank algorithm here.  You
      are expected to parallelize the algorithm using openMP.  Your
      solution may need to allocate (and free) temporary arrays.

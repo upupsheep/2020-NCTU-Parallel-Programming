@@ -3,8 +3,7 @@
 
 using Vertex = int;
 
-struct graph
-{
+struct graph {
     // Number of edges in the graph
     int num_edges;
     // Number of vertices in the graph
@@ -34,7 +33,6 @@ static inline const Vertex* incoming_begin(const Graph, Vertex);
 static inline const Vertex* incoming_end(const Graph, Vertex);
 static inline int incoming_size(const Graph, Vertex);
 
-
 /* IO */
 Graph load_graph(const char* filename);
 Graph load_graph_binary(const char* filename);
@@ -42,10 +40,8 @@ void store_graph_binary(const char* filename, Graph);
 
 void print_graph(const graph*);
 
-
 /* Deallocation */
 void free_graph(Graph);
-
 
 /* Included here to enable inlining. Don't look. */
 #include "graph_internal.h"
