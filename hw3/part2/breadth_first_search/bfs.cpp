@@ -96,7 +96,6 @@ void bfs_top_down(Graph graph, solution *sol) {
     }
 }
 
-/*
 void bottom_up_step(
     graph *g,
     vertex_set *frontier,
@@ -111,17 +110,17 @@ void bottom_up_step(
 #pragma omp for reduction(+ \
                           : local_count)
         for (int i = 0; i < g->num_nodes; i++) {
-            if (frontier->present[i] == BOTTOMUP_NOT_VISITED_MARKER) {
+            if (frontier->vertices[i] == BOTTOMUP_NOT_VISITED_MARKER) {
                 int start_edge = g->incoming_starts[i];
                 int end_edge = (i == g->num_nodes - 1) ? g->num_edges : g->incoming_starts[i + 1];
                 for (int neighbor = start_edge; neighbor < end_edge; neighbor++) {
                     int incoming = g->incoming_edges[neighbor];
-                    // if(__sync_bool_compare_and_swap(&frontier->present[incoming], iteration, distances[node] + 1))
-                    if (frontier->present[incoming] == iteration) {
+                    // if(__sync_bool_compare_and_swap(&frontier->vertices[incoming], iteration, distances[node] + 1))
+                    if (frontier->vertices[incoming] == iteration) {
                         distances[i] = distances[incoming] + 1;
                         // frontier->count++;
                         local_count++;
-                        frontier->present[i] = iteration + 1;
+                        frontier->vertices[i] = iteration + 1;
                         break;
                     }
                 }
@@ -130,7 +129,6 @@ void bottom_up_step(
     }
     frontier->count = local_count;
 }
-*/
 
 void bfs_bottom_up(Graph graph, solution *sol) {
     // For PP students:
@@ -144,7 +142,7 @@ void bfs_bottom_up(Graph graph, solution *sol) {
     // As was done in the top-down case, you may wish to organize your
     // code by creating subroutine bottom_up_step() that is called in
     // each step of the BFS process.
-    /*
+
     vertex_set list1;
 
     vertex_set_init(&list1, graph->num_nodes);
@@ -155,7 +153,7 @@ void bfs_bottom_up(Graph graph, solution *sol) {
 
     // setup frontier with the root node
     // just like put the root into queue
-    frontier->present[frontier->count++] = 1;
+    frontier->vertices[frontier->count++] = 1;
 
     // set the root distance with 0
     sol->distances[ROOT_NODE_ID] = 0;
@@ -172,7 +170,6 @@ void bfs_bottom_up(Graph graph, solution *sol) {
 
         iteration++;
     }
-    */
 }
 
 void bfs_hybrid(Graph graph, solution *sol) {
