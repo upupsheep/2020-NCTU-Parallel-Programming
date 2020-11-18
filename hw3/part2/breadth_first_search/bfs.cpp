@@ -33,7 +33,6 @@ void top_down_step(
     int *distances) {
     int local_count = 0;
 
-#pragma omp parallel private(local_count) {
     for (int i = 0; i < frontier->count; i++) {
         int node = frontier->vertices[i];
 
@@ -48,14 +47,11 @@ void top_down_step(
 
             if (distances[outgoing] == NOT_VISITED_MARKER) {
                 distances[outgoing] = distances[node] + 1;
-                // int index = new_frontier->count++;
-                // new_frontier->vertices[index] = outgoing;
-                local_count++;
-                new_frontier->vertices[local_count] = outgoing;
+                int index = new_frontier->count++;
+                new_frontier->vertices[index] = outgoing;
             }
         }
     }
-}
 }
 
 // Implements top-down BFS.
