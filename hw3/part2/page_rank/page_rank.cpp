@@ -64,6 +64,7 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
     double score_new, global_diff;
     int i, v;
 
+#pragma omp parallel for
     // initialization: see example code above
     for (int i = 0; i < numNodes; ++i) {
         score_old[i] = equal_prob;
@@ -71,6 +72,7 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
 
     // graph index with no outgoing edges
     vector<int> no_outgoing;
+#pragma omp for nowait
     for (i = 0; i < numNodes; i++) {
         if (outgoing_size(g, i) == 0) {
             no_outgoing.push_back(i);
@@ -80,12 +82,15 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
     while (!converged) {
         global_diff = 0.0;
 
+#pragma omp parallel {
         // compute score_new[vi] for all nodes vi:
         for (i = 0; i < numNodes; i++) {
             score_new = 0.0;
             const Vertex *in_begin = incoming_begin(g, i);
             const Vertex *in_end = incoming_end(g, i);
 
+#pragma omp parallel for reduction(+ \
+                                   : score_new)
             // score_new[vi] = sum over all nodes vj reachable from incoming edges
             // { score_old[vj] / number of edges leaving vj  }
             for (const Vertex *vj = in_begin; vj != in_end; vj++) {
@@ -95,6 +100,8 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
             // score_new[vi] = (damping * score_new[vi]) + (1.0-damping) / numNodes;
             score_new = (damping * score_new) + (1.0 - damping) / numNodes;
 
+#pragma omp parallel for reduction(+ \
+                                   : score_new)
             // score_new[vi] += sum over all nodes v in graph with no outgoing edges
             // { damping * score_old[v] / numNodes }
             for (v = 0; v < no_outgoing.size(); v++) {
@@ -106,11 +113,12 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
             // global_diff = sum over all nodes vi { abs(score_new[vi] - score_old[vi]) };
             global_diff += abs(score_new - score_old[i]);
         }
-        // converged = (global_diff < convergence)
-        converged = (global_diff < convergence);
-        memcpy(score_old, solution, sizeof(double) * numNodes);
     }
+    // converged = (global_diff < convergence)
+    converged = (global_diff < convergence);
+    memcpy(score_old, solution, sizeof(double) * numNodes);
+}
 
-    free(score_old);
-    no_outgoing.clear();
+free(score_old);
+no_outgoing.clear();
 }
