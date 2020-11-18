@@ -82,7 +82,6 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
     while (!converged) {
         global_diff = 0.0;
 
-#pragma omp parallel {
         // compute score_new[vi] for all nodes vi:
         for (i = 0; i < numNodes; i++) {
             score_new = 0.0;
@@ -113,12 +112,12 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
             // global_diff = sum over all nodes vi { abs(score_new[vi] - score_old[vi]) };
             global_diff += abs(score_new - score_old[i]);
         }
-    }
-    // converged = (global_diff < convergence)
-    converged = (global_diff < convergence);
-    memcpy(score_old, solution, sizeof(double) * numNodes);
-}
 
-free(score_old);
-no_outgoing.clear();
+        // converged = (global_diff < convergence)
+        converged = (global_diff < convergence);
+        memcpy(score_old, solution, sizeof(double) * numNodes);
+    }
+
+    free(score_old);
+    no_outgoing.clear();
 }
