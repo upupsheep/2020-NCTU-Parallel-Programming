@@ -60,7 +60,7 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
    */
 
     double *score_old = (double *)malloc(sizeof(double) * numNodes);
-    g bool converged = false;
+    bool converged = false;
     double score_new, global_diff;
     int i, v;
 
