@@ -2,11 +2,14 @@
 
 #include <stdlib.h>
 #include <cmath>
+#include <vector>
 #include <omp.h>
 #include <utility>
 
 #include "../common/CycleTimer.h"
 #include "../common/graph.h"
+
+using namespace std;
 
 // pageRank --
 //
@@ -15,14 +18,16 @@
 // damping:     page-rank algorithm's damping parameter
 // convergence: page-rank algorithm's convergence threshold
 //
-void pageRank(Graph g, double *solution, double damping, double convergence) {
+void pageRank(Graph g, double* solution, double damping, double convergence) {
     // initialize vertex weights to uniform probability. Double
     // precision scores are used to avoid underflow for large graphs
 
     int numNodes = num_nodes(g);
     double equal_prob = 1.0 / numNodes;
     for (int i = 0; i < numNodes; ++i) {
-        solution[i] = equal_prob;
+        // solution[i] = equal_prob;
+        // initialization: see example code above
+        score_old[i] = equal_prob;
     }
 
     /*
@@ -53,4 +58,56 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
      }
 
    */
+
+    double* score_old = (double*)malloc(sizeof(double) * numNodes);
+
+    const Vertex *in_begin, in_end;
+    const Vertex* vj;
+    bool converged = false;
+    double score_new, global_diff;
+    int i, v;
+
+    // graph index with no outgoing edges
+    vector<int> no_outgoing;
+    for (i = 0; i < numNodes; i++) {
+        if (outgoing_size(g, i) == 0) {
+            no_outgoing.push_back(i);
+        }
+    }
+
+    while (!converged) {
+        global_diff = 0.0;
+
+        // compute score_new[vi] for all nodes vi:
+        for (i = 0; i < numNodes; i++) {
+            score_new = 0.0;
+            in_begin = incoming_begin(g, i);
+            in_end = incoming_end(g, i);
+
+            // score_new[vi] = sum over all nodes vj reachable from incoming edges
+            // { score_old[vj] / number of edges leaving vj  }
+            for (vj = in_begin; vj != in_end; vj++) {
+                score_new += score_old[*vj] / outgoing_size(g, *vj);
+            }
+
+            // score_new[vi] = (damping * score_new[vi]) + (1.0-damping) / numNodes;
+            score_new = (damping * score_new) + (1.0 - damping) / numNodes;
+
+            // score_new[vi] += sum over all nodes v in graph with no outgoing edges
+            // { damping * score_old[v] / numNodes }
+            for (v = 0; v < no_outgoing.size(); v++) {
+                score_new += damping * score_old[v] / numNodes;
+            }
+
+            solution[i] = score_new;
+
+            // global_diff = sum over all nodes vi { abs(score_new[vi] - score_old[vi]) };
+            global_diff += abs(score_new - score_old[i]);
+        }
+        // converged = (global_diff < convergence)
+        converged = (global_diff < convergence);
+    }
+
+    free(score_old);
+    no_outgoing.clear();
 }
