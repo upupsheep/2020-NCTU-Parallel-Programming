@@ -11,6 +11,7 @@
 
 #define ROOT_NODE_ID 0
 #define NOT_VISITED_MARKER -1
+#define BOTTOMUP_NOT_VISITED_MARKER 0
 
 void vertex_set_clear(vertex_set *list) {
     list->count = 0;
@@ -30,6 +31,11 @@ void top_down_step(
     vertex_set *frontier,
     vertex_set *new_frontier,
     int *distances) {
+    int local_count = 0;
+
+#pragma omp parallel {
+#pragma omp for reduction(+ \
+                          : local_count)
     for (int i = 0; i < frontier->count; i++) {
         int node = frontier->vertices[i];
 
@@ -44,11 +50,19 @@ void top_down_step(
 
             if (distances[outgoing] == NOT_VISITED_MARKER) {
                 distances[outgoing] = distances[node] + 1;
-                int index = new_frontier->count++;
-                new_frontier->vertices[index] = outgoing;
+                // int index = new_frontier->count++;
+                // new_frontier->vertices[index] = outgoing;
+                local_count++;
+                new_frontier->vertices[local_count] = outgoing;
             }
         }
     }
+#pragma omp critical
+    {
+        memcpy(new_frontier->present + new_frontier->count, local_frontier, local_count * sizeof(int));
+        new_frontier->count += local_count;
+    }
+}
 }
 
 // Implements top-down BFS.
@@ -93,6 +107,7 @@ void bfs_top_down(Graph graph, solution *sol) {
     }
 }
 
+/*
 void bottom_up_step(
     graph *g,
     vertex_set *frontier,
@@ -126,6 +141,7 @@ void bottom_up_step(
     }
     frontier->count = local_count;
 }
+*/
 
 void bfs_bottom_up(Graph graph, solution *sol) {
     // For PP students:
@@ -139,6 +155,7 @@ void bfs_bottom_up(Graph graph, solution *sol) {
     // As was done in the top-down case, you may wish to organize your
     // code by creating subroutine bottom_up_step() that is called in
     // each step of the BFS process.
+    /*
     vertex_set list1;
 
     vertex_set_init(&list1, graph->num_nodes);
@@ -166,6 +183,7 @@ void bfs_bottom_up(Graph graph, solution *sol) {
 
         iteration++;
     }
+    */
 }
 
 void bfs_hybrid(Graph graph, solution *sol) {
