@@ -37,6 +37,7 @@ void pageRank(Graph g, double *solution, double damping, double convergence) {
 
      Basic page rank pseudocode is provided below to get you started:
 
+	 // test
      // initialization: see example code above
      score_old[vi] = 1/numNodes;
 
