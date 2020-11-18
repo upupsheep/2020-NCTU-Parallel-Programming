@@ -33,7 +33,7 @@ void top_down_step(
     int *distances) {
     int local_count = 0;
 
-#pragma omp parallel private(local count) {
+#pragma omp parallel private(local_count)
 #pragma omp for reduction(+ \
                           : local_count)
     for (int i = 0; i < frontier->count; i++) {
@@ -57,12 +57,6 @@ void top_down_step(
             }
         }
     }
-#pragma omp critical
-    {
-        memcpy(new_frontier->vertices + new_frontier->count, local_frontier, local_count * sizeof(int));
-        new_frontier->count += local_count;
-    }
-}
 }
 
 // Implements top-down BFS.
