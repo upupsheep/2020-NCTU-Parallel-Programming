@@ -97,7 +97,7 @@ void bfs_top_down(Graph graph, solution *sol) {
 }
 
 void bottom_up_step(
-    graph *g,
+    Graph g,
     vertex_set *frontier,
     int *distances,
     int iteration) {
