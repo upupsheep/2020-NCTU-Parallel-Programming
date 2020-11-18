@@ -31,7 +31,6 @@ void top_down_step(
     vertex_set *frontier,
     vertex_set *new_frontier,
     int *distances) {
-
     for (int i = 0; i < frontier->count; i++) {
         int node = frontier->vertices[i];
 
@@ -176,4 +175,31 @@ void bfs_hybrid(Graph graph, solution *sol) {
     //
     // You will need to implement the "hybrid" BFS here as
     // described in the handout.
+    vertex_set list1;
+
+    vertex_set_init(&list1, graph->num_nodes);
+
+    int iteration = 1;
+
+    vertex_set *frontier = &list1;
+
+    // setup frontier with the root node
+    // just like put the root into queue
+    frontier->vertices[frontier->count++] = 1;
+
+    // set the root distance with 0
+    sol->distances[ROOT_NODE_ID] = 0;
+
+    // just like pop the queue
+    while (frontier->count != 0) {
+        frontier->count = 0;
+        double start_time = CycleTimer::currentSeconds();
+
+        bottom_up_step(graph, frontier, sol->distances, iteration);
+
+        double end_time = CycleTimer::currentSeconds();
+        printf("frontier=%-10d %.4f sec\n", frontier->count, end_time - start_time);
+
+        iteration++;
+    }
 }
