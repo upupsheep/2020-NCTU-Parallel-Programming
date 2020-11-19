@@ -12,6 +12,7 @@
 #define ROOT_NODE_ID 0
 #define NOT_VISITED_MARKER -1
 #define BOTTOMUP_NOT_VISITED_MARKER 0
+#define THRESHOLD 10000000
 
 void vertex_set_clear(vertex_set *list) {
     list->count = 0;
@@ -32,7 +33,7 @@ void top_down_step(
     vertex_set *new_frontier,
     int *distances) {
     int local_count = 0;
-#pragma omp parallel {
+#pragma omp parallel
 #pragma omp for reduction(+ \
                           : local_count)
     for (int i = 0; i < frontier->count; i++) {
@@ -57,7 +58,6 @@ void top_down_step(
         }
     }
     new_frontier->count = local_count;
-}
 }
 
 // Implements top-down BFS.
@@ -193,7 +193,7 @@ void bfs_hybrid(Graph graph, solution *sol) {
 
     // setup frontier with the root node
     // just like put the root into queue
-    memset(frontier->present, 0, sizeof(int) * graph->num_nodes);
+    memset(frontier->vertices, 0, sizeof(int) * graph->num_nodes);
 
     frontier->vertices[frontier->count++] = 1;
 
