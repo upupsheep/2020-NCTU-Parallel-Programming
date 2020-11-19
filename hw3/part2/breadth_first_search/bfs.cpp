@@ -43,7 +43,7 @@ void top_down_step(
             // attempt to add all neighbors to the new frontier
             for (int neighbor = start_edge; neighbor < end_edge; neighbor++) {
                 int outgoing = g->outgoing_edges[neighbor];
-                if (frontier->present[outgoing] == BOTTOMUP_NOT_VISITED_MARKER) {
+                if (frontier->vertices[outgoing] == BOTTOMUP_NOT_VISITED_MARKER) {
                     distances[outgoing] = distances[i] + 1;
                     local_count++;
                     frontier->vertices[outgoing] = iteration + 1;
@@ -93,7 +93,7 @@ void bfs_top_down(Graph graph, solution *sol) {
     vertex_set *frontier = &list1;
     // vertex_set *new_frontier = &list2;
 
-    memset(frontier->present, 0, sizeof(int) * graph->num_nodes);
+    memset(frontier->vertices, 0, sizeof(int) * graph->num_nodes);
 
     // initialize all nodes to NOT_VISITED
     // for (int i = 0; i < graph->num_nodes; i++)
@@ -109,7 +109,7 @@ void bfs_top_down(Graph graph, solution *sol) {
         double start_time = CycleTimer::currentSeconds();
 #endif
 
-        vertex_set_clear(new_frontier);
+        // vertex_set_clear(new_frontier);
         frontier->count = 0;
 
         // top_down_step(graph, frontier, new_frontier, sol->distances);
