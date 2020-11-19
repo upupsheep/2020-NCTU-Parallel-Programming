@@ -9,11 +9,9 @@
 #include "../common/CycleTimer.h"
 #include "../common/graph.h"
 
-
 #define ROOT_NODE_ID 0
 #define NOT_VISITED_MARKER -1
 #define BOTTOMUP_NOT_VISITED_MARKER 0
-
 
 void vertex_set_clear(vertex_set *list) {
     list->count = 0;
@@ -33,6 +31,10 @@ void top_down_step(
     vertex_set *frontier,
     vertex_set *new_frontier,
     int *distances) {
+    int local_count = 0;
+#pragma omp parallel {
+#pragma omp for reduction(+ \
+                          : local_count)
     for (int i = 0; i < frontier->count; i++) {
         int node = frontier->vertices[i];
 
@@ -47,11 +49,15 @@ void top_down_step(
 
             if (distances[outgoing] == NOT_VISITED_MARKER) {
                 distances[outgoing] = distances[node] + 1;
-                int index = new_frontier->count++;
-                new_frontier->vertices[index] = outgoing;
+                // int index = new_frontier->count++;
+                // new_frontier->vertices[index] = outgoing;
+                local_count++;
+                new_frontier->vertices[local_count] = outgoing;
             }
         }
     }
+    new_frontier->count = local_count;
+}
 }
 
 // Implements top-down BFS.
@@ -187,6 +193,8 @@ void bfs_hybrid(Graph graph, solution *sol) {
 
     // setup frontier with the root node
     // just like put the root into queue
+    memset(frontier->present, 0, sizeof(int) * graph->num_nodes);
+
     frontier->vertices[frontier->count++] = 1;
 
     // set the root distance with 0
@@ -194,13 +202,16 @@ void bfs_hybrid(Graph graph, solution *sol) {
 
     // just like pop the queue
     while (frontier->count != 0) {
-        frontier->count = 0;
-        double start_time = CycleTimer::currentSeconds();
+        if (frontier->count >= THRESHOLD) {
+            frontier->count = 0;
+            bottom_up_step(graph, frontier, sol->distances, iteration);
+        } else {
+            frontier->count = 0;
+            top_down_step(graph, frontier, sol->distances, iteration);
+        }
 
-        bottom_up_step(graph, frontier, sol->distances, iteration);
-
-        double end_time = CycleTimer::currentSeconds();
-        printf("frontier=%-10d %.4f sec\n", frontier->count, end_time - start_time);
+        // double end_time = CycleTimer::currentSeconds();
+        // printf("frontier=%-10d %.4f sec\n", frontier->count, end_time - start_time);
 
         iteration++;
     }
