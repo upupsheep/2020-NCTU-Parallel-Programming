@@ -33,25 +33,26 @@ void top_down_step(
     int *distances,
     int iteration) {
     int local_count = 0;
-    // #pragma omp parallel
-    // #pragma omp for reduction(+ \
-//                           : local_count)
-    for (int i = 0; i < g->num_nodes; i++) {
-        if (frontier->vertices[i] == iteration) {
-            int start_edge = g->outgoing_starts[i];
-            int end_edge = (i == g->num_nodes - 1) ? g->num_edges : g->outgoing_starts[i + 1];
-            // attempt to add all neighbors to the new frontier
-            for (int neighbor = start_edge; neighbor < end_edge; neighbor++) {
-                int outgoing = g->outgoing_edges[neighbor];
-                if (frontier->vertices[outgoing] == BOTTOMUP_NOT_VISITED_MARKER) {
-                    distances[outgoing] = distances[i] + 1;
-                    local_count++;
-                    frontier->vertices[outgoing] = iteration + 1;
+#pragma omp parallel
+    {
+#pragma omp for reduction(+ \
+                          : local_count)
+        for (int i = 0; i < g->num_nodes; i++) {
+            if (frontier->vertices[i] == iteration) {
+                int start_edge = g->outgoing_starts[i];
+                int end_edge = (i == g->num_nodes - 1) ? g->num_edges : g->outgoing_starts[i + 1];
+                // attempt to add all neighbors to the new frontier
+                for (int neighbor = start_edge; neighbor < end_edge; neighbor++) {
+                    int outgoing = g->outgoing_edges[neighbor];
+                    if (frontier->vertices[outgoing] == BOTTOMUP_NOT_VISITED_MARKER) {
+                        distances[outgoing] = distances[i] + 1;
+                        local_count++;
+                        frontier->vertices[outgoing] = iteration + 1;
+                    }
                 }
             }
         }
-    }
-    /*
+        /*
     for (int i = 0; i < frontier->count; i++) {
         int node = frontier->vertices[i];
 
@@ -73,8 +74,10 @@ void top_down_step(
             }
         }
     }
+    
     new_frontier->count = local_count;
     */
+    }
     frontier->count = local_count;
 }
 
