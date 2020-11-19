@@ -33,9 +33,9 @@ void top_down_step(
     int *distances,
     int iteration) {
     int local_count = 0;
-#pragma omp parallel
-#pragma omp for reduction(+ \
-                          : local_count)
+    // #pragma omp parallel
+    // #pragma omp for reduction(+ \
+//                           : local_count)
     for (int i = 0; i < g->num_nodes; i++) {
         if (frontier->vertices[i] == iteration) {
             int start_edge = g->outgoing_starts[i];
@@ -147,7 +147,6 @@ void bottom_up_step(
                 int end_edge = (i == g->num_nodes - 1) ? g->num_edges : g->incoming_starts[i + 1];
                 for (int neighbor = start_edge; neighbor < end_edge; neighbor++) {
                     int incoming = g->incoming_edges[neighbor];
-                    // if(__sync_bool_compare_and_swap(&frontier->vertices[incoming], iteration, distances[node] + 1))
                     if (frontier->vertices[incoming] == iteration) {
                         distances[i] = distances[incoming] + 1;
                         // frontier->count++;
