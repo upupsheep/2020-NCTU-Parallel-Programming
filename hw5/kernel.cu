@@ -25,7 +25,7 @@ __global__ void mandelKernel(int *c, float lowerX, float lowerY, float stepX, fl
     //
     // float x = lowerX + thisX * stepX;
     // float y = lowerY + thisY * stepY;
-	
+	/*
 	int pix_per_thread = resX * resY / (gridDim.x * blockDim.x);
 	int tId = blockDim.x * blockIdx.x + threadIdx.x;
 	int offset = pix_per_thread * tId;
@@ -47,6 +47,15 @@ __global__ void mandelKernel(int *c, float lowerX, float lowerY, float stepX, fl
 		float ci = lowerY + y * stepY;
 		c[y * resY + x] = diverge_gpu(cr, ci, maxIterations);
 	}
+	*/
+	int index = threadIdx.x + blockIdx.x * blockDim.x;
+
+	int thisX = index % resX;
+	int thisY = index / resX;
+
+	float x = lowerX + thisX * stepX;
+	float y = lowerY + thisY * stepY;
+	c[index] = diverge_gpu(x, y, maxIterations);
 
 }
 
