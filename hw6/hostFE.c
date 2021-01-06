@@ -37,7 +37,7 @@ void hostFE(int filterWidth, float *filter, int imageHeight, int imageWidth,
 	//clSetKernelArg(kernel, 5, sizeof(int), (void *)&imageWidth);
 
     // set local and global workgroup sizes
-    size_t localws[2] = {10, 10};
+    size_t localws[2] = {8, 8};
     size_t globalws[2] = {imageWidth, imageHeight};
 	
     // execute kernel
