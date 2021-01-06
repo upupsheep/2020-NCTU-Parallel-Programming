@@ -1,6 +1,6 @@
 __kernel void convolution(const __global float * input, 
 	__global float * output,
-	__global float * filter,
+	__constant float * filter,
     int filterWidth) 
 {	
 	int imageWidth = get_global_size(0);
