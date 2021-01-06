@@ -37,25 +37,25 @@ void hostFE(int filterWidth, float *filter, int imageHeight, int imageWidth,
 	clSetKernelArg(kernel, 5, sizeof(int), (void *)&imageWidth);
 
     // set local and global workgroup sizes
-    size_t localws[2] = {16, 16};
+    size_t localws[2] = {10, 10};
     size_t globalws[2] = {imageWidth, imageHeight};
 	
     // execute kernel
-    clEnqueueNDRangeKernel(myqueue, kernel, 2, 0, globalws, localws, 0, NULL, NULL);
+    clEnqueueNDRangeKernel(myqueue, kernel, 2, 0, &globalws, &localws, 0, NULL, NULL);
 
     // copy results from device back to host
-    clEnqueueReadBuffer(*context, d_out, CL_TRUE, 0, image_data_size, outputImage, 0, NULL, NULL); // CL_TRUE: blocking read back
+    clEnqueueReadBuffer(myqueue, d_out, CL_TRUE, 0, image_data_size, outputImage, 0, NULL, NULL); // CL_TRUE: blocking read back
 
     // clean up
-	/*	
+		
     status = clFlush(myqueue);
     status = clFinish(myqueue);
     status = clReleaseKernel(kernel);
-    status = clReleaseProgram(*program);
+    //status = clReleaseProgram(*program);
     status = clReleaseMemObject(d_in);
     status = clReleaseMemObject(d_filter);
     status = clReleaseMemObject(d_out);
     status = clReleaseCommandQueue(myqueue);
-    status = clReleaseContext(*context);
-	*/
+    //status = clReleaseContext(*context);
+	
 }
