@@ -11,13 +11,10 @@ __kernel void convolution(const __global float * input,
 	int i = get_global_id(1);
 	int j = get_global_id(0);
     
-    int rowOffset = i * imageWidth;
-    int my = j + rowOffset;
 
     float sum = 0.0;
-    int fIndex = 0;
-    for (int r = -halffilterSize; r <= halffilterSize; r++) {
-		int curRow = my + r * (imageWidth);
+    
+	for (int r = -halffilterSize; r <= halffilterSize; r++) {
 		for (int c = -halffilterSize; c <= halffilterSize; c++) {				
 			sum += input[(i + r) * imageWidth + j + c] * filter[(r + halffilterSize) * filterWidth + c + halffilterSize];
 		}
