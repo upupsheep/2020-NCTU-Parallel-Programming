@@ -33,8 +33,8 @@ void hostFE(int filterWidth, float *filter, int imageHeight, int imageWidth,
     clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&d_out);
     clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&d_filter);
     clSetKernelArg(kernel, 3, sizeof(int), (void *)&filterWidth);
-	clSetKernelArg(kernel, 4, sizeof(int), (void *)&imageHeight);
-	clSetKernelArg(kernel, 5, sizeof(int), (void *)&imageWidth);
+	//clSetKernelArg(kernel, 4, sizeof(int), (void *)&imageHeight);
+	//clSetKernelArg(kernel, 5, sizeof(int), (void *)&imageWidth);
 
     // set local and global workgroup sizes
     size_t localws[2] = {10, 10};
