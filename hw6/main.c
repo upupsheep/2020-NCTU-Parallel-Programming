@@ -82,61 +82,23 @@ int main(int argc, char **argv)
    // Output image on the host
    float *outputImage = (float *)malloc(dataSize);
 
+   // Output image of reference on the host
+   float *refImage = NULL;
+   refImage = (float *)malloc(dataSize);
+   memset(refImage, 0, dataSize);
+
+   serialConv(filterWidth, filter, imageHeight, imageWidth, inputImage, refImage);
+
    // helper init CL
    cl_program program;
    cl_device_id device;
    cl_context context;
    initCL(&device, &context, &program);
 
-   double minThread = 0;
-   double recordThread[10] = {0};
-   for (int i = 0; i < 10; ++i)
-   {
-      memset(outputImage, 0, dataSize);
-      start_time = currentSeconds();
-      // Run the host to execute the kernel
-      hostFE(filterWidth, filter, imageHeight, imageWidth, inputImage, outputImage,
+   hostFE(filterWidth, filter, imageHeight, imageWidth, inputImage, outputImage,
              &device, &context, &program);
-      end_time = currentSeconds();
-      recordThread[i] = end_time - start_time;
-   }
-   qsort(recordThread, 10, sizeof(double), compare);
-   for (int i = 3; i < 7; ++i)
-   {
-      minThread += recordThread[i];
-   }
-   minThread /= 4;
-
-   printf("\n[conv opencl]:\t\t[%.3f] ms\n\n", minThread * 1000);
 
    // Write the output image to file
-   storeImage(outputImage, outputFile, imageHeight, imageWidth, inputFile);
-
-   // Output image of reference on the host
-   float *refImage = NULL;
-   refImage = (float *)malloc(dataSize);
-   memset(refImage, 0, dataSize);
-
-   double minSerial = 0;
-   double recordSerial[10] = {0};
-   for (int i = 0; i < 10; ++i)
-   {
-      memset(refImage, 0, dataSize);
-      start_time = currentSeconds();
-      serialConv(filterWidth, filter, imageHeight, imageWidth, inputImage, refImage);
-      end_time = currentSeconds();
-      recordSerial[i] = end_time - start_time;
-   }
-   qsort(recordSerial, 10, sizeof(double), compare);
-   for (int i = 3; i < 7; ++i)
-   {
-      minSerial += recordSerial[i];
-   }
-   minSerial /= 4;
-
-   printf("\n[conv serial]:\t\t[%.3f] ms\n\n", minSerial * 1000);
-
-   storeImage(refImage, refFile, imageHeight, imageWidth, inputFile);
 
    int diff_counter = 0;
    for (i = 0; i < imageHeight; i++)
@@ -155,12 +117,12 @@ int main(int argc, char **argv)
 
    if (diff_ratio > 0.1)
    {
-      printf("\n\033[31mFAILED:\tResults are incorrect!\n");
+      printf("\n\033[31mFAILED:\tResults are incorrect!\033[0m\n");
       return -1;
    }
    else
    {
-      printf("\n\033[32mPASS:\t(%.2fx speedup over the serial version)\n", minSerial / minThread);
+      printf("\n\033[32mPASS\033[0m\n");
    }
 
    return 0;
